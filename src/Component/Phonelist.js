@@ -21,7 +21,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Pagination from '@mui/material/Pagination';
 
-import './Style.css';
+
 // import { IconButton } from "@mui/material";
 
 function Phonelist() {
@@ -36,27 +36,25 @@ function Phonelist() {
   const [filterLabel, setFilterLabel] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setitemsPerPage] = useState(10);
-  
  
+  const displayedContacts = searchterm && results.length === 0 ? [] : (results.length > 0 ? results : contacts);
    const indexOfLastContact = currentPage * itemsPerPage;
    const indexOfFirstContact = indexOfLastContact - itemsPerPage;
-   const currentContacts = (results.length > 0 ? results : contacts).slice(indexOfFirstContact, indexOfLastContact);
+   const currentContacts = displayedContacts.slice(indexOfFirstContact, indexOfLastContact);
  
-  
+ 
    useEffect(() => {
-     const storedContacts = JSON.parse(localStorage.getItem('contacts'));
+     const storedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
      console.log('loaded contacts',storedContacts)
-     if (storedContacts) {
        setContacts(storedContacts);
-     }
+     
    }, []);
  
-   
    useEffect(() => {
+    if(contacts.length>0){
      localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
    }, [contacts]);
-  
-
 
    const handleSearch = (e) => {
     const term = e.target.value;
@@ -68,19 +66,16 @@ function Phonelist() {
     setCurrentPage(1);
   };
 
-  const applyLabelFilter = () => {
-    if (filterLabel) {
-
+  const applyLabelFilter = () =>{
+    if (filterLabel){
       const filteredContacts = contacts.filter(contact => contact.label === filterLabel);
-      setResults(filteredContacts); 
+      setResults(filteredContacts);  
+
     } else {
-     
       setResults(contacts);
     }
     setCurrentPage(1);
   };
-  
-
  
   const handleAddContact = () => {
     if (name && phone && label) {
@@ -92,9 +87,9 @@ function Phonelist() {
       } else {
         updatedContacts = [...contacts, { name, phone, label, bookmarked: false }];
       }
-        
+       
       updatedContacts.sort((a, b) => a.name.localeCompare(b.name));
-  
+ 
       setContacts(updatedContacts);
       setName("");
       setPhone("");
@@ -103,7 +98,7 @@ function Phonelist() {
       alert("Please fill in all fields.");
     }
   };
-  
+ 
   const handleEditContact = (index) => {
     setName(contacts[index].name);
     setPhone(contacts[index].phone);
@@ -115,26 +110,34 @@ function Phonelist() {
   const deleteData = (index) => {
     const updatedData = contacts.filter((_, i) => i !== index);
     setContacts(updatedData);
+    localStorage.setItem('contacts',JSON.stringify(updatedData));  
   };
 
-  
+ 
+ 
   const handleClick = (index) => {
-    const updatedContacts = contacts.map((contact, i) =>
-      i === index ? { ...contact, bookmarked: true } : contact
-    );
+    const updatedContacts = [...contacts];
+    updatedContacts[index] = { ...updatedContacts[index], bookmarked: true };
+    
+   
+    updatedContacts.sort((a, b) => b.bookmarked - a.bookmarked);  
+  
     setContacts(updatedContacts);
   };
-
   
   const handleDoubleClick = (index) => {
-    const updatedContacts = contacts.map((contact, i) =>
-      i === index ? { ...contact, bookmarked: false } : contact
-    );
+    const updatedContacts = [...contacts];
+    updatedContacts[index] = { ...updatedContacts[index], bookmarked: false };
+    
+  
+    updatedContacts.sort((a, b) => b.bookmarked - a.bookmarked);  
+    
     setContacts(updatedContacts);
   };
-
   
-  const handlePageChange = (value) => {
+
+ 
+  const handlePageChange = (event,value) => {
     setCurrentPage(value);
   };
 
@@ -149,25 +152,47 @@ function Phonelist() {
           onChange={handleSearch}
           id="outlined-basic" label="Search Contact" variant="outlined" />
 
-        <Grid item lg={20} sm={6}>
-          <FormControl fullWidth size="small">
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth size="small" sx={{ minWidth: 100, marginLeft: 1 }}>
             <InputLabel>Label</InputLabel>
-            <Select
+            <Select 
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               label="Label"
             >
               <MenuItem value="Family">Family</MenuItem>
               <MenuItem value="Friends">Friends</MenuItem>
+              <MenuItem value="School">School</MenuItem>
               <MenuItem value="Work">Work</MenuItem>
-              <MenuItem value="Others">Others</MenuItem>
+              <MenuItem value="Others">Others</MenuItem> 
+              <MenuItem value="office">office</MenuItem> 
+
             </Select>
           </FormControl>
         </Grid>
 
-        <FilterAltOutlinedIcon onClick={applyLabelFilter}
-          style={{ fontSize: '30px', marginLeft: '10px' }} >
-        </FilterAltOutlinedIcon>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth size="small" sx={{ minWidth: 60, marginLeft: 1 }}>
+            <InputLabel>filter</InputLabel>
+            <Select 
+              value={filterLabel}
+              onMouseEnter={applyLabelFilter}
+              onChange={(e) => setFilterLabel(e.target.value)}
+              label="filter"
+            >
+              <MenuItem value="Family">Family</MenuItem>
+              <MenuItem value="Friends">Friends</MenuItem>
+              <MenuItem value="School">School</MenuItem>
+              <MenuItem value="Work">Work</MenuItem>
+              <MenuItem value="Others">Others</MenuItem> 
+              <MenuItem value="office">office</MenuItem> 
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* <FilterAltOutlinedIcon onClick={applyLabelFilter}
+          style={{ fontSize: '30px', marginLeft: '10px' }}>
+        </FilterAltOutlinedIcon> */}
       </Box>
 
       <Grid container spacing={2} sx={{ marginBottom: '20px', display: 'flex' }}>
@@ -197,10 +222,10 @@ function Phonelist() {
       </Grid>
 
       <Button variant="contained" color="primary" onClick={handleAddContact}>
-        {editindex !== null ? 'Edit Contact' : 'Add Contact'}
+        {editindex !== null ? 'Edit Contact': 'Add Contact'}
       </Button>
 
-      
+     
       <Grid container spacing={2} sx={{ marginTop: '20px' }}>
         {currentContacts.map((contact, index) => (
           <Grid item xs={12} key={index}>
