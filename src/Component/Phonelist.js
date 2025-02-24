@@ -99,7 +99,7 @@ function Phonelist() {
     }
   };
  
-  const handleEditContact = (index) => {
+  const handleEditContact = (index) =>{
     setName(contacts[index].name);
     setPhone(contacts[index].phone);
     setLabel(contacts[index].label);
