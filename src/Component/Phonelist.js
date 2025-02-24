@@ -135,12 +135,9 @@ function Phonelist() {
     setContacts(updatedContacts);
   };
   
-
- 
   const handlePageChange = (event,value) => {
     setCurrentPage(value);
   };
-
 
   return (
     <Container maxWidth="sm                                                                                                                                                     " sx={{ marginTop: '40px' }}>
