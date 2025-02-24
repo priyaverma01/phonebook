@@ -113,25 +113,17 @@ function Phonelist() {
     localStorage.setItem('contacts',JSON.stringify(updatedData));  
   };
 
- 
- 
   const handleClick = (index) => {
     const updatedContacts = [...contacts];
     updatedContacts[index] = { ...updatedContacts[index], bookmarked: true };
-    
-   
     updatedContacts.sort((a, b) => b.bookmarked - a.bookmarked);  
-  
     setContacts(updatedContacts);
   };
   
   const handleDoubleClick = (index) => {
     const updatedContacts = [...contacts];
     updatedContacts[index] = { ...updatedContacts[index], bookmarked: false };
-    
-  
     updatedContacts.sort((a, b) => b.bookmarked - a.bookmarked);  
-    
     setContacts(updatedContacts);
   };
   
@@ -155,7 +147,7 @@ function Phonelist() {
             <Select 
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              label="Label"
+              label="label"
             >
               <MenuItem value="Family">Family</MenuItem>
               <MenuItem value="Friends">Friends</MenuItem>
